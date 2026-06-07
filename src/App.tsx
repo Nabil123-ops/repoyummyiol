@@ -11,29 +11,6 @@ import AdminPanel from './components/AdminPanel';
 import CategoriesPromoBanners from './components/CategoriesPromoBanners';
 import { Sparkles, ArrowLeft, Search, Phone, ShieldCheck, Heart, Trash2, MapPin, Truck, RefreshCw, AlertCircle, ShoppingBag, HelpCircle, ChevronDown, Check, Star, Menu, MessageSquare, X, ArrowRight } from 'lucide-react';
 
-const CATEGORY_NAMES_AR: Record<string, string> = {
-  "body-care": "العناية بالجسم",
-  "face-care": "العناية بالوجه",
-  "intimate-care": "العناية بالمناطق الحساسة",
-  "hair-care": "العناية بالشعر",
-  "essential-oils": "الزيوت العطرية والأساسية",
-  "oils-serums-essences": "الزيوت والسيروم والنضارة الطبيعية",
-  "lips-lashes": "الشفاه والرموش والعيون",
-  "lips-eyebrows-and-lashes": "الشفاه والحواجب كوزمتكس",
-  "makhmariya": "المخمرية الشرقية المعطرة",
-  "makhmaria": "مخمرية الشعر ومسك الجسم للجنسين",
-  "musk-al-tahara": "مسك الطهارة الملكي الأصلي",
-  "misk-el-tahara": "مسك الطهارة الأبيض اليدوي",
-  "bath-bombs-soaps": "فوارات الاستحمام والصابون الطبيعي",
-  "imported": "المنتجات العالمية المستوردة",
-  "gentlemen": "مجموعة العناية والترطيب للرجال",
-  "younger-products": "منتجات الأطفال والبشرة الحساسة",
-  "younger": "مستحضرات العناية بالبشرة الشابة والطفل",
-  "candles": "شموع الصويا الدافئة وعطور المنزل",
-  "accessories": "إكسسوارات العناية وأدوات التدليك",
-  "sets": "صناديق ومجموعات الهدايا الفاخرة"
-};
-
 export default function App() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -181,8 +158,8 @@ export default function App() {
     // 3. Text query searches
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      const matchName = p.name.toLowerCase().includes(q) || (p.name_ar && p.name_ar.toLowerCase().includes(q));
-      const matchDesc = p.description.toLowerCase().includes(q) || (p.description_ar && p.description_ar.toLowerCase().includes(q));
+      const matchName = p.name.toLowerCase().includes(q);
+      const matchDesc = p.description.toLowerCase().includes(q);
       const matchCategory = p.category.toLowerCase().includes(q);
       return matchName || matchDesc || matchCategory;
     }
@@ -515,37 +492,23 @@ export default function App() {
                       </div>
                     </div>
 
-                    <h1 className="text-3xl sm:text-4xl font-serif font-black tracking-tight leading-snug text-slate-900 text-left">
+                    <h1 className="text-3xl sm:text-4xl font-sans font-extrabold tracking-tight leading-snug text-slate-950 text-left">
                       {activeDetailProduct.name}
                     </h1>
-                    {activeDetailProduct.name_ar && (
-                      <h2 className="text-2xl sm:text-3xl font-sans font-extrabold text-pink-700 text-right mt-1.5 leading-snug" dir="rtl">
-                        {activeDetailProduct.name_ar}
-                      </h2>
-                    )}
 
                     {activeDetailProduct.weight_or_size && (
-                      <div className="inline-flex items-center bg-pink-50/50 border border-pink-100 text-pink-700 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold">
+                      <div className="inline-flex items-center bg-slate-50 border border-slate-200 text-slate-900 px-3 py-1.5 rounded-lg text-xs font-mono font-bold">
                         Quantity/Size: {activeDetailProduct.weight_or_size}
                       </div>
                     )}
 
-                    <div className="pt-3 border-t border-pink-100/60 space-y-4">
+                    <div className="pt-3 border-t border-slate-200/60 space-y-4">
                       <div>
-                        <h4 className="text-xs uppercase font-mono tracking-wider font-bold text-slate-400">English Description</h4>
-                        <p className="text-sm text-slate-605 leading-relaxed font-light mt-1 text-left">
+                        <h4 className="text-xs uppercase font-mono tracking-wider font-bold text-slate-400">Description</h4>
+                        <p className="text-sm text-slate-700 leading-relaxed font-light mt-1 text-left">
                           {activeDetailProduct.description}
                         </p>
                       </div>
-                      
-                      {activeDetailProduct.description_ar && (
-                        <div className="p-4 bg-pink-50/35 border border-pink-100/50 rounded-2xl text-right" dir="rtl">
-                          <h4 className="text-xs uppercase font-sans tracking-wide font-extrabold text-pink-650 mb-1">وصف المنتج باللغة العربية</h4>
-                          <p className="text-sm text-slate-800 leading-relaxed font-medium">
-                            {activeDetailProduct.description_ar}
-                          </p>
-                        </div>
-                      )}
                     </div>
 
                     <div className="pt-4 flex items-baseline gap-3">
@@ -663,11 +626,11 @@ export default function App() {
                         }}
                         className="group flex flex-col items-center gap-3 cursor-pointer select-none text-center transform transition-transform"
                       >
-                        {/* Circular Cropped container with double pink border */}
+                        {/* Circular Cropped container with double black/slate border */}
                         <div className={`relative w-36 h-36 sm:w-40 sm:h-40 rounded-full overflow-hidden transition-all duration-300 transform group-hover:scale-105 shadow-md ${
                           isSelected 
-                            ? 'ring-4 ring-pink-500 ring-offset-4 shadow-xl scale-105' 
-                            : 'border-2 border-pink-100 hover:border-pink-300'
+                            ? 'ring-4 ring-black ring-offset-4 shadow-xl scale-105' 
+                            : 'border-2 border-slate-200 hover:border-black'
                         }`}>
                           <img 
                             src={cat.image_url} 
@@ -675,13 +638,13 @@ export default function App() {
                             className="absolute inset-0 w-full h-full object-cover"
                             referrerPolicy="no-referrer"
                           />
-                          <div className={`absolute inset-0 bg-pink-500/10 transition-opacity ${isSelected ? 'opacity-0' : 'group-hover:opacity-0 opacity-20'}`} />
+                          <div className={`absolute inset-0 bg-salmon-500/10 transition-opacity ${isSelected ? 'opacity-0' : 'group-hover:opacity-0 opacity-20'}`} />
                         </div>
                         
                         {/* Title text label */}
                         <div className="space-y-1">
                           <p className={`font-sans font-extrabold text-sm tracking-tight transition-colors ${
-                            isSelected ? 'text-pink-650 font-black' : 'text-slate-800 group-hover:text-pink-500'
+                            isSelected ? 'text-black font-black font-sans' : 'text-slate-800 group-hover:text-salmon-500 font-sans'
                           }`}>
                             {cat.name}
                           </p>
@@ -776,18 +739,12 @@ export default function App() {
 
                     return (
                       <div key={cat.id} id={`category-section-${cat.id}`} className="space-y-6 scroll-mt-24">
-                        {/* Category Row header, beautifully aligned & dual english+arabic with Luxury Shopify standard */}
-                        <div className="flex items-end justify-between border-b border-pink-100 pb-3">
+                        {/* Category Row header, beautifully aligned and styled in high contrast black */}
+                        <div className="flex items-end justify-between border-b border-slate-200 pb-3">
                           <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 text-left">
-                            <h3 className="font-serif font-black text-slate-900 text-lg sm:text-xl md:text-2xl tracking-tight">
+                            <h3 className="font-sans font-extrabold text-slate-950 text-lg sm:text-xl md:text-2xl tracking-tight">
                               {cat.name}
                             </h3>
-                            <span 
-                              className="text-pink-650 font-sans font-extrabold text-sm sm:text-base tracking-wide" 
-                              dir="rtl"
-                            >
-                              ({CATEGORY_NAMES_AR[cat.id] || cat.name})
-                            </span>
                           </div>
                           
                           {/* "Browse More" trigger */}

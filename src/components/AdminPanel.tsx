@@ -37,7 +37,7 @@ export default function AdminPanel({
 
   // Form states
   const [productForm, setProductForm] = useState<Partial<Product>>({
-    id: '', name: '', name_ar: '', description: '', description_ar: '', category: '', price: 0, discount_price: undefined,
+    id: '', name: '', description: '', category: '', price: 0, discount_price: undefined,
     image_url: '', is_flash_sale: false, stock: 50, rating: 4.5, weight_or_size: ''
   });
   const [isEditingProduct, setIsEditingProduct] = useState(false);
@@ -108,9 +108,7 @@ export default function AdminPanel({
     const payload: Product = {
       id: productForm.id || "PROD-" + Math.floor(1000 + Math.random() * 9000),
       name: productForm.name,
-      name_ar: productForm.name_ar || undefined,
       description: productForm.description || '',
-      description_ar: productForm.description_ar || undefined,
       category: productForm.category,
       price: Number(productForm.price),
       discount_price: productForm.discount_price ? Number(productForm.discount_price) : undefined,
@@ -128,7 +126,7 @@ export default function AdminPanel({
     // Clear
     setIsEditingProduct(false);
     setProductForm({
-      id: '', name: '', name_ar: '', description: '', description_ar: '', category: '', price: 0, discount_price: undefined,
+      id: '', name: '', description: '', category: '', price: 0, discount_price: undefined,
       image_url: '', is_flash_sale: false, stock: 50, rating: 4.5, weight_or_size: ''
     });
     onRefreshData();
@@ -393,7 +391,7 @@ export default function AdminPanel({
                         onClick={() => {
                           setIsEditingProduct(false);
                           setProductForm({
-                            id: '', name: '', name_ar: '', description: '', description_ar: '', category: '', price: 0, discount_price: undefined,
+                            id: '', name: '', description: '', category: '', price: 0, discount_price: undefined,
                             image_url: '', is_flash_sale: false, stock: 50, rating: 4.5, weight_or_size: ''
                           });
                         }}
@@ -522,28 +520,15 @@ export default function AdminPanel({
                       </label>
                     </div>
 
-                    <div className="md:col-span-3 space-y-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-1 text-left">
-                        <label className="text-[11px] text-slate-400 font-semibold font-mono">Product Description (English)</label>
-                        <textarea
-                          rows={2.5}
-                          placeholder="Detail skincare benefits, essential extracts, and volume directions..."
-                          value={productForm.description || ''}
-                          onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
-                          className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs focus:ring-1 focus:ring-amber-500 resize-none"
-                        ></textarea>
-                      </div>
-
-                      <div className="space-y-1 text-right" dir="rtl">
-                        <label className="text-[11px] text-slate-400 font-sans font-bold block text-amber-300">وصف المنتج (باللغة العربية)</label>
-                        <textarea
-                          rows={2.5}
-                          placeholder="اكتب فوائد ومميزات ومكونات هذا المنتج للعناية بالجسم..."
-                          value={productForm.description_ar || ''}
-                          onChange={(e) => setProductForm({ ...productForm, description_ar: e.target.value })}
-                          className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs focus:ring-1 focus:ring-amber-500 resize-none text-right font-sans"
-                        ></textarea>
-                      </div>
+                    <div className="md:col-span-3 space-y-1 text-left">
+                      <label className="text-[11px] text-slate-400 font-semibold font-mono">Product Description</label>
+                      <textarea
+                        rows={3}
+                        placeholder="Detail skincare benefits, organic highlights, and usage directions..."
+                        value={productForm.description || ''}
+                        onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
+                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs focus:ring-1 focus:ring-amber-500 resize-none"
+                      ></textarea>
                     </div>
 
                     <button

@@ -399,8 +399,6 @@ function mapDBRowToProduct(row: any): Product {
   
   let rawDescription = String(row.description || row.desc || row.details || row.summary || "");
   let description = rawDescription;
-  let description_ar = row.description_ar || row.arabic_description || row.desc_ar || row.arabic_desc || row.descriptionAr || undefined;
-  let name_ar = row.name_ar || row.arabic_name || row.title_ar || row.arabic_title || row.nameAr || undefined;
   
   // Align categories with slug/subcategory matching
   const category = String(row.subcategory || row.slug || row.category || row.category_id || row.cat || "body-care").toLowerCase().trim();
@@ -414,14 +412,6 @@ function mapDBRowToProduct(row: any): Product {
       description = englishPart;
     } else if (parts[0]) {
       description = parts[0];
-    }
-    
-    // Find any line that has Arabic characters or has question marks that indicate corrupted Arabic text
-    if (!description_ar) {
-      const arabicPart = parts.find(p => /[\u0600-\u06FF]/.test(p) || (p.includes('??') && p !== englishPart));
-      if (arabicPart) {
-        description_ar = arabicPart;
-      }
     }
   }
 
@@ -455,55 +445,10 @@ function mapDBRowToProduct(row: any): Product {
   const weight_or_size = String(row.weight_or_size || row.size || row.weight || row.unit || "");
   const slug = row.slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
 
-  // Generate a beautiful, clean localized Arabic subtitle and description fallback based on the category if missing/corrupted
-  if (!name_ar || name_ar.includes("??") || name_ar.includes("؟؟")) {
-    const slugKey = category.toLowerCase();
-    const catArMapping: Record<string, string> = {
-      "accessories": "إكسسوارات العناية الفاخرة",
-      "makhmaria": "مخمرية العطور الشرقية الفاخرة",
-      "bath-bombs-soaps": "كرات الاستحمام والصابون الطبيعي",
-      "body-care": "منتجات العناية الفائقة بالجسم",
-      "candles": "شموع الصويا الفاخرة المعطرة",
-      "face-care": "مستحضرات العناية والترطيب للوجه",
-      "flash-sale": "تخفيضات العروض الحصرية الكبرى",
-      "gentlemen": "مستحضرات العناية الرجالية الفاخرة",
-      "hair-care": "زيوت مغذية للعناية بالشعر",
-      "lips-eyebrows-and-lashes": "سيروم تكثيف الشفاه والرموش",
-      "intimate-care": "منتجات العناية الشخصية اللطيفة",
-      "misk-el-tahara": "مسك الطهارة الأصلي الفاخر",
-      "oils-serums-essences": "زيوت وسيروم النضارة الطبيعي",
-      "younger": "منتجات لطيفة للبشرة الشابة الحساسة"
-    };
-    name_ar = catArMapping[slugKey] || "منتج تجميل طبيعي فاخر";
-  }
-
-  if (!description_ar || description_ar.includes("??") || description_ar.includes("؟؟")) {
-    const slugKey = category.toLowerCase();
-    const descArMapping: Record<string, string> = {
-      "accessories": "أدوات وإكسسوارات تجميلية طبيعية مخصصة للمحافظة على نضارة ونعومة البشرة يومياً.",
-      "makhmaria": "مخمرية مغذية ومعطرة للجسم والشعر بتركيبة زيتية طبيعية تدوم لساعات طويلة بنفحات شرقية ساحرة.",
-      "bath-bombs-soaps": "صابون عضوي طبيعي وكرات استحمام فوارة غنية بالزيوت العطرية والترطيب العميق لتجربة استحمام مريحة.",
-      "body-care": "لوشن كريمي غني بالعناصر الطبيعية لتغذية بشرة الجسم وحمايتها من الجفاف بعبق عطري فاخر.",
-      "candles": "شمعة صويا طبيعية 100% معطرة بزيوت أساسية مهدئة ومصممة لخلق أجواء دافئة ومميزة وراحة مطلقة في المنزل.",
-      "face-care": "سيروم مغذي وكريم مرطب مصمم لتوحيد لون البشرة ومكافحة التجاعيد وإظهار توهج الوجه الطبيعي.",
-      "flash-sale": "عروض وتخفيضات حصرية مذهلة ولفترة محدودة للغاية على أرقى مستحضرات التجميل والعناية بالجسم والبشرة.",
-      "gentlemen": "زيوت ومستحضرات خاصة للعناية الكاملة باللحية وبشرة الوجه للرجال بتركيبة ممتازة وسريعة الامتصاص.",
-      "hair-care": "علاج مكثف لتغذية بصيلات الشعر وتنعيمه وحمايته من التلف والتساقط باستخدام مستخلصات زيوت طبيعية 100%.",
-      "lips-eyebrows-and-lashes": "تركيبة مغذية بزيوت الفيتامينات الأساسية لتكثيف وتقوية الرموش وترطيب الشفاه ومضاعفة جاذبيتها.",
-      "intimate-care": "غسول ناعم مهدئ ولطيف تم اختباره طبياً ومصمم خصيصاً للمناطق الحساسة لتأمين الحماية والانتعاش.",
-      "misk-el-tahara": "مسك الطهارة الأبيض الفاخر الأصلي لتعطير الجسم بنقاء مميز ورائحة عطرة وجاذبية تدوم طوال اليوم.",
-      "oils-serums-essences": "مستخلصات زيوت وسيروم نقية مئة بالمئة لتفتيح خلايا الجلد وحمايتها بلمعان طبيعي لا يضاهى.",
-      "younger": "منتجات فائقة اللطف ومصممة خصيصاً لتناسب البشرة الحساسة لليافعين والأطفال وتعمل على ترطيبها وحمايتها."
-    };
-    description_ar = descArMapping[slugKey] || "مستحضرات تجميلية فاخرة وطبيعية للعناية المتكاملة بجمالك وتألقك يومياً بأعلى جودة.";
-  }
-
   return {
     id,
     name,
-    name_ar: name_ar ? String(name_ar) : undefined,
     description,
-    description_ar: description_ar ? String(description_ar) : undefined,
     category,
     price,
     discount_price,

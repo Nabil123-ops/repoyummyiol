@@ -177,40 +177,6 @@ export default function Navbar({
           </div>
         </div>
 
-        {/* Category filters bar */}
-        <div id="category-scroller" className="flex items-center gap-2 overflow-x-auto pb-3 pt-2.5 scrollbar-none border-t border-salmon-50">
-          <button
-            id="cat-all"
-            onClick={() => {
-              setSelectedCategory(null);
-              setFlashSaleFilter(false);
-            }}
-            className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer shadow-xs ${
-              selectedCategory === null && !flashSaleFilter
-                ? 'bg-salmon-500 text-white font-bold'
-                : 'bg-white hover:bg-salmon-50 text-salmon-600 border border-salmon-200'
-            }`}
-          >
-            All Products
-          </button>
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => {
-                setSelectedCategory(cat.id);
-                setFlashSaleFilter(false);
-              }}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer shadow-xs ${
-                selectedCategory === cat.id
-                  ? 'bg-salmon-500 text-white font-bold'
-                  : 'bg-white hover:bg-salmon-50 text-salmon-600 border border-salmon-200'
-              }`}
-            >
-              {cat.name}
-            </button>
-          ))}
-        </div>
-
       </div>
     </nav>
   );
