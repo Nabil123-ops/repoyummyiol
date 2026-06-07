@@ -223,7 +223,7 @@ export default function CheckoutModal({ isOpen, onClose, cart, onClearCart }: Ch
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 py-3 bg-pink-50 hover:bg-pink-100 rounded-xl font-bold text-pink-600 text-sm cursor-pointer border border-pink-100"
+                className="flex-1 py-3 bg-pink-100/80 hover:bg-pink-200 rounded-xl font-bold text-pink-700 hover:text-pink-905 text-sm cursor-pointer border border-pink-200 transition-all"
               >
                 Go Back
               </button>

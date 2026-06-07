@@ -105,13 +105,10 @@ export default function App() {
       let prods = await getProducts();
       let cats = await getCategories();
 
-      // Check if products and categories can match. If they don't or either is empty,
+      // Check if products and categories can match. If either is empty,
       // fallback to the pre-linked default datasets to guarantee beautiful rendering.
-      const categoryIds = new Set(cats.map(c => c.id));
-      const hasSomeMatch = prods.some(p => categoryIds.has(p.category));
-
-      if ((!hasSomeMatch || prods.length === 0 || cats.length === 0) && DEFAULT_PRODUCTS.length > 0) {
-        console.warn("Database alignment mismatch: no products belong to these categories. Aligning with default datasets.");
+      if ((prods.length === 0 || cats.length === 0) && DEFAULT_PRODUCTS.length > 0) {
+        console.warn("Database is empty or failed to load. Aligning with default datasets.");
         prods = DEFAULT_PRODUCTS;
         cats = DEFAULT_CATEGORIES;
       }
@@ -303,7 +300,7 @@ export default function App() {
                 className={`w-full p-3 rounded-xl text-xs font-bold flex items-center justify-between transition-all ${
                   selectedCategory === null && !flashSaleFilter
                     ? 'bg-pink-100 text-pink-700 font-black'
-                    : 'bg-white text-slate-700 hover:bg-pink-50/55 border border-pink-50'
+                    : 'bg-pink-50/60 hover:bg-pink-100 text-pink-700 hover:text-pink-850 border border-pink-100'
                 }`}
               >
                 <span>Preview All Products</span>
@@ -343,11 +340,11 @@ export default function App() {
                   className={`w-full p-3 rounded-xl text-xs font-bold flex items-center gap-3 transition-all ${
                     selectedCategory === cat.id
                       ? 'bg-pink-500 text-white font-black'
-                      : 'bg-white text-slate-700 hover:bg-pink-50/55 border border-pink-50'
+                      : 'bg-pink-50/50 hover:bg-pink-100 text-pink-750 hover:text-pink-850 border border-pink-100'
                   }`}
                 >
                   <img src={cat.image_url} alt={cat.name} className="w-7 h-7 rounded-full object-cover bg-slate-100 border border-pink-100/50" />
-                  <span className="flex-1">{cat.name}</span>
+                  <span className="flex-1 text-left">{cat.name}</span>
                   <Check className={`w-4 h-4 ${selectedCategory === cat.id ? 'opacity-100' : 'opacity-0'}`} />
                 </button>
               ))}
@@ -723,7 +720,7 @@ export default function App() {
                     setFlashSaleFilter(false);
                     setSearchQuery('');
                   }}
-                  className="px-4 py-2 bg-white border border-pink-100 hover:border-pink-300 hover:bg-pink-50/50 text-xs font-bold rounded-xl text-pink-700 hover:text-pink-900 transition-all self-start sm:self-center cursor-pointer shadow-sm select-none"
+                  className="px-4 py-2 bg-pink-100/90 hover:bg-pink-200 border border-pink-200 text-xs font-bold rounded-xl text-pink-750 hover:text-pink-900 transition-all self-start sm:self-center cursor-pointer shadow-sm select-none"
                 >
                   View All Products (Clear Filters)
                 </button>
@@ -1061,7 +1058,7 @@ export default function App() {
                   onClick={() => {
                     navigateTo('/admin');
                   }}
-                  className="px-3.5 py-1.5 border border-pink-200 hover:border-pink-350 hover:bg-pink-50 text-pink-600 text-[11px] font-bold rounded-xl transition-all cursor-pointer"
+                  className="px-4 py-2 bg-pink-100/90 hover:bg-pink-200 text-pink-700 hover:text-pink-900 border border-pink-200/80 text-[11px] font-bold rounded-xl transition-all cursor-pointer shadow-xs"
                 >
                   Admin Operations Portal
                 </button>

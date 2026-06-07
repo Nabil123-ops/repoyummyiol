@@ -139,7 +139,7 @@ export default function ProductCard({ product, onAddToCart, cartQuantity }: Prod
             className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold select-none transition-all cursor-pointer shadow-xs ${
               cartQuantity > 0
                 ? 'bg-pink-600 text-white px-3.5'
-                : 'bg-pink-50 hover:bg-pink-100 text-pink-600 border border-pink-100 hover:border-pink-305'
+                : 'bg-pink-100/80 hover:bg-pink-200 text-pink-750 border border-pink-200/90'
             }`}
           >
             {cartQuantity > 0 ? (

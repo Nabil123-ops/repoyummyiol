@@ -186,10 +186,10 @@ export default function Navbar({
               setSelectedCategory(null);
               setFlashSaleFilter(false);
             }}
-            className={`px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all cursor-pointer shadow-sm ${
+            className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer shadow-sm ${
               selectedCategory === null && !flashSaleFilter
                 ? 'bg-pink-600 text-white font-semibold'
-                : 'text-slate-705 bg-white border border-pink-100 hover:bg-pink-50'
+                : 'bg-pink-50/60 hover:bg-pink-100 text-pink-700 hover:text-pink-850 border border-pink-100/80'
             }`}
           >
             All Products
@@ -201,10 +201,10 @@ export default function Navbar({
                 setSelectedCategory(cat.id);
                 setFlashSaleFilter(false);
               }}
-              className={`px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all cursor-pointer shadow-sm ${
+              className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer shadow-sm ${
                 selectedCategory === cat.id
                   ? 'bg-pink-500 text-white font-semibold'
-                  : 'text-slate-705 bg-white border border-pink-100 hover:bg-pink-50'
+                  : 'bg-pink-50/60 hover:bg-pink-100 text-pink-700 hover:text-pink-850 border border-pink-100/80'
               }`}
             >
               {cat.name}

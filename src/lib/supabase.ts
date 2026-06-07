@@ -552,10 +552,10 @@ export async function getProducts(): Promise<Product[]> {
   };
 
   try {
-    // Race database queries with a 1.8-second hard timeout to avoid page loading freezes
+    // Race database queries with a 12-second hard timeout to avoid page loading freezes
     const results = await Promise.race([
       Promise.all(tableNames.map(name => queryTable(name))),
-      new Promise<any[]>((_, reject) => setTimeout(() => reject(new Error("Supabase select timeout")), 1800))
+      new Promise<any[]>((_, reject) => setTimeout(() => reject(new Error("Supabase select timeout")), 12000))
     ]);
 
     results.forEach(data => {
@@ -612,10 +612,10 @@ export async function getCategories(): Promise<Category[]> {
   };
 
   try {
-    // Race database queries with a 1.8-second hard timeout
+    // Race database queries with a 12-second hard timeout
     const results = await Promise.race([
       Promise.all(tableNames.map(name => queryTable(name))),
-      new Promise<any[]>((_, reject) => setTimeout(() => reject(new Error("Supabase categories select timeout")), 1800))
+      new Promise<any[]>((_, reject) => setTimeout(() => reject(new Error("Supabase categories select timeout")), 12000))
     ]);
 
     results.forEach((data, index) => {
@@ -675,6 +675,51 @@ export async function getOrders(): Promise<Order[]> {
   return local ? JSON.parse(local) : [];
 }
 
+function formatProductForTable(product: Product, tableName: string): any {
+  if (tableName === 'online_store_products' || tableName === 'all_products') {
+    const capitalizedCategory = product.category.charAt(0).toUpperCase() + product.category.slice(1);
+    return {
+      id: isNaN(Number(product.id)) ? Math.floor(Math.random() * 100000) : Number(product.id),
+      product_name: product.name,
+      price_before: product.price,
+      price_after: product.discount_price || null,
+      category: capitalizedCategory,
+      subcategory: product.category,
+      description: product.description,
+      image_url: product.image_url
+    };
+  }
+  
+  if (tableName === 'products') {
+    return {
+      id: isNaN(Number(product.id)) ? product.id : Number(product.id),
+      name: product.name,
+      price: product.price,
+      discount_price: product.discount_price || null,
+      category: product.category,
+      description: product.description,
+      image_url: product.image_url,
+      is_flash_sale: product.is_flash_sale || false,
+      stock: product.stock !== undefined ? product.stock : 50,
+      rating: product.rating !== undefined ? product.rating : 4.5,
+      weight_or_size: product.weight_or_size || ""
+    };
+  }
+
+  return product;
+}
+
+function formatCategoryForTable(category: Category, tableName: string): any {
+  if (tableName === 'categories') {
+    return {
+      id: isNaN(Number(category.id)) ? Math.floor(Math.random() * 100000) : Number(category.id),
+      name: category.name,
+      slug: category.id
+    };
+  }
+  return category;
+}
+
 export async function saveProduct(product: Product): Promise<boolean> {
   let success = false;
   
@@ -682,18 +727,21 @@ export async function saveProduct(product: Product): Promise<boolean> {
   const targetTables = ['online_store_products', 'all_products', 'products', 'yummy_products'];
   for (const table of targetTables) {
     try {
-      const { error } = await supabase.from(table).upsert(product);
+      const dbRow = formatProductForTable(product, table);
+      const { error } = await supabase.from(table).upsert(dbRow);
       if (!error) {
         success = true;
+      } else {
+        console.warn(`Error writing to table "${table}":`, error);
       }
-    } catch {
-      // Quietly continue to next table if one doesn't exist
+    } catch (e) {
+      console.warn(`Query to table "${table}" caught error:`, e);
     }
   }
 
   // Always update local storage
   const current = await getProducts();
-  const index = current.findIndex(p => p.id === product.id);
+  const index = current.findIndex(p => String(p.id) === String(product.id));
   if (index >= 0) {
     current[index] = product;
   } else {
@@ -706,9 +754,16 @@ export async function saveProduct(product: Product): Promise<boolean> {
 export async function deleteProduct(productId: string): Promise<boolean> {
   let success = false;
   const targetTables = ['online_store_products', 'all_products', 'products', 'yummy_products'];
+  const filterIdNum = isNaN(Number(productId)) ? null : Number(productId);
+  
   for (const table of targetTables) {
     try {
-      const { error } = await supabase.from(table).delete().eq('id', productId);
+      // Use numeric id for online_store_products / all_products, or string id where appropriate
+      const idToFilter = (table === 'online_store_products' || table === 'all_products') && filterIdNum !== null 
+        ? filterIdNum 
+        : productId;
+
+      const { error } = await supabase.from(table).delete().eq('id', idToFilter);
       if (!error) {
         success = true;
       }
@@ -718,7 +773,7 @@ export async function deleteProduct(productId: string): Promise<boolean> {
   }
 
   const current = await getProducts();
-  const updated = current.filter(p => p.id !== productId);
+  const updated = current.filter(p => String(p.id) !== String(productId));
   localStorage.setItem('yummy_products', JSON.stringify(updated));
   return success;
 }
@@ -728,7 +783,8 @@ export async function saveCategory(category: Category): Promise<boolean> {
   const targetTables = ['categories', 'subcategories', 'yummy_categories'];
   for (const table of targetTables) {
     try {
-      const { error } = await supabase.from(table).upsert(category);
+      const dbRow = formatCategoryForTable(category, table);
+      const { error } = await supabase.from(table).upsert(dbRow);
       if (!error) {
         success = true;
       }
@@ -738,7 +794,7 @@ export async function saveCategory(category: Category): Promise<boolean> {
   }
 
   const current = await getCategories();
-  const index = current.findIndex(c => c.id === category.id);
+  const index = current.findIndex(c => String(c.id) === String(category.id));
   if (index >= 0) {
     current[index] = category;
   } else {
@@ -751,9 +807,15 @@ export async function saveCategory(category: Category): Promise<boolean> {
 export async function deleteCategory(categoryId: string): Promise<boolean> {
   let success = false;
   const targetTables = ['categories', 'subcategories', 'yummy_categories'];
+  const filterIdNum = isNaN(Number(categoryId)) ? null : Number(categoryId);
+
   for (const table of targetTables) {
     try {
-      const { error } = await supabase.from(table).delete().eq('id', categoryId);
+      const idToFilter = table === 'categories' && filterIdNum !== null 
+        ? filterIdNum 
+        : categoryId;
+
+      const { error } = await supabase.from(table).delete().eq('id', idToFilter);
       if (!error) {
         success = true;
       }
@@ -763,7 +825,7 @@ export async function deleteCategory(categoryId: string): Promise<boolean> {
   }
 
   const current = await getCategories();
-  const updated = current.filter(c => c.id !== categoryId);
+  const updated = current.filter(c => String(c.id) !== String(categoryId));
   localStorage.setItem('yummy_categories', JSON.stringify(updated));
   return success;
 }
