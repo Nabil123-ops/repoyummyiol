@@ -268,8 +268,8 @@ export default function AdminPanel({
               </div>
 
               <div>
-                <h3 className="text-xl font-bold font-serif text-slate-100">Administrator Credentials</h3>
-                <p className="text-xs text-slate-400 mt-1.5 font-light">Enter authorized administrative details to access the management panel.</p>
+                <h3 className="text-xl font-bold font-serif text-slate-100">Administrator Operations Log In</h3>
+                <p className="text-xs text-slate-400 mt-1.5 font-light">Please authenticate your session to manage the store catalog.</p>
               </div>
 
               {loginError && (

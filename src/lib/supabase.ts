@@ -395,23 +395,52 @@ export const DEFAULT_PRODUCTS: Product[] = [
 
 function mapDBRowToProduct(row: any): Product {
   const id = String(row.id || row.product_id || row.id_key || row.uid || Math.random().toString());
-  const name = String(row.name || row.title || row.product_name || row.label || "Premium Product");
-  const description = String(row.description || row.desc || row.details || row.summary || "");
-  const description_ar = row.description_ar || row.arabic_description || row.desc_ar || row.arabic_desc || row.descriptionAr || undefined;
-  const name_ar = row.name_ar || row.arabic_name || row.title_ar || row.arabic_title || row.nameAr || undefined;
-  const category = String(row.category || row.category_id || row.cat || row.category_name || "body-care");
+  const name = String(row.product_name || row.name || row.title || row.label || "Premium Product");
   
-  // Parse price
-  let price = Number(row.price !== undefined ? row.price : (row.cost || row.price_usd || 10.00));
+  let rawDescription = String(row.description || row.desc || row.details || row.summary || "");
+  let description = rawDescription;
+  let description_ar = row.description_ar || row.arabic_description || row.desc_ar || row.arabic_desc || row.descriptionAr || undefined;
+  let name_ar = row.name_ar || row.arabic_name || row.title_ar || row.arabic_title || row.nameAr || undefined;
+  
+  // Align categories with slug/subcategory matching
+  const category = String(row.subcategory || row.slug || row.category || row.category_id || row.cat || "body-care").toLowerCase().trim();
+
+  // Smart splitting for description strings containing both English and Arabic separated by newlines
+  if (rawDescription.includes('\n')) {
+    const parts = rawDescription.split('\n').map(p => p.trim()).filter(Boolean);
+    // Find first non-empty part that starts with "Yummy" or is primarily English
+    const englishPart = parts.find(p => !/[\u0600-\u06FF]/.test(p) && !p.includes('??'));
+    if (englishPart) {
+      description = englishPart;
+    } else if (parts[0]) {
+      description = parts[0];
+    }
+    
+    // Find any line that has Arabic characters or has question marks that indicate corrupted Arabic text
+    if (!description_ar) {
+      const arabicPart = parts.find(p => /[\u0600-\u06FF]/.test(p) || (p.includes('??') && p !== englishPart));
+      if (arabicPart) {
+        description_ar = arabicPart;
+      }
+    }
+  }
+
+  // Parse price: look for price_before first (which in online_store_products is the base price), otherwise price/cost
+  let price = Number(row.price_before !== undefined && row.price_before !== null ? row.price_before : (row.price !== undefined ? row.price : (row.cost || 10.00)));
   if (isNaN(price)) price = 10.00;
 
-  // Parse discount_price
+  // Parse discount_price (in online_store_products, price_after is the promotional/active price)
   let discount_price = undefined;
-  const dVal = row.discount_price !== undefined ? row.discount_price : (row.discounted_price || row.discount || row.sale_price);
-  if (dVal !== undefined && dVal !== null) {
-    const val = Number(dVal);
-    if (!isNaN(val) && val > 0 && val < price) {
-      discount_price = val;
+  const priceAfter = row.price_after !== undefined && row.price_after !== null ? Number(row.price_after) : undefined;
+  if (priceAfter !== undefined && !isNaN(priceAfter) && priceAfter > 0 && priceAfter < price) {
+    discount_price = priceAfter;
+  } else {
+    const dVal = row.discount_price !== undefined ? row.discount_price : (row.discounted_price || row.discount || row.sale_price);
+    if (dVal !== undefined && dVal !== null) {
+      const val = Number(dVal);
+      if (!isNaN(val) && val > 0 && val < price) {
+        discount_price = val;
+      }
     }
   }
 
@@ -419,11 +448,55 @@ function mapDBRowToProduct(row: any): Product {
   const image_url = String(row.image_url || row.image || row.image_path || row.img || row.img_url || "https://images.unsplash.com/photo-1599490659213-e2b9527ec087?q=80&w=600&auto=format&fit=crop");
 
   // Parse other attributes
-  const is_flash_sale = Boolean(row.is_flash_sale !== undefined ? row.is_flash_sale : (row.flash || row.on_sale || false));
-  const stock = Number(row.stock !== undefined ? row.stock : (row.quantity || row.inventory || 50));
+  // In the real products table, if name/category is Flash Sale or discount exists, it defaults to flash sale
+  const is_flash_sale = Boolean(row.is_flash_sale !== undefined ? row.is_flash_sale : (row.flash || row.on_sale || category === 'flash-sale' || discount_price !== undefined));
+  const stock = Number(row.stock !== undefined ? row.stock : (row.quantity || row.inventory || row.stock_quantity || 50));
   const rating = Number(row.rating !== undefined ? row.rating : (row.stars || row.rate || 4.5));
   const weight_or_size = String(row.weight_or_size || row.size || row.weight || row.unit || "");
   const slug = row.slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+
+  // Generate a beautiful, clean localized Arabic subtitle and description fallback based on the category if missing/corrupted
+  if (!name_ar || name_ar.includes("??") || name_ar.includes("؟؟")) {
+    const slugKey = category.toLowerCase();
+    const catArMapping: Record<string, string> = {
+      "accessories": "إكسسوارات العناية الفاخرة",
+      "makhmaria": "مخمرية العطور الشرقية الفاخرة",
+      "bath-bombs-soaps": "كرات الاستحمام والصابون الطبيعي",
+      "body-care": "منتجات العناية الفائقة بالجسم",
+      "candles": "شموع الصويا الفاخرة المعطرة",
+      "face-care": "مستحضرات العناية والترطيب للوجه",
+      "flash-sale": "تخفيضات العروض الحصرية الكبرى",
+      "gentlemen": "مستحضرات العناية الرجالية الفاخرة",
+      "hair-care": "زيوت مغذية للعناية بالشعر",
+      "lips-eyebrows-and-lashes": "سيروم تكثيف الشفاه والرموش",
+      "intimate-care": "منتجات العناية الشخصية اللطيفة",
+      "misk-el-tahara": "مسك الطهارة الأصلي الفاخر",
+      "oils-serums-essences": "زيوت وسيروم النضارة الطبيعي",
+      "younger": "منتجات لطيفة للبشرة الشابة الحساسة"
+    };
+    name_ar = catArMapping[slugKey] || "منتج تجميل طبيعي فاخر";
+  }
+
+  if (!description_ar || description_ar.includes("??") || description_ar.includes("؟؟")) {
+    const slugKey = category.toLowerCase();
+    const descArMapping: Record<string, string> = {
+      "accessories": "أدوات وإكسسوارات تجميلية طبيعية مخصصة للمحافظة على نضارة ونعومة البشرة يومياً.",
+      "makhmaria": "مخمرية مغذية ومعطرة للجسم والشعر بتركيبة زيتية طبيعية تدوم لساعات طويلة بنفحات شرقية ساحرة.",
+      "bath-bombs-soaps": "صابون عضوي طبيعي وكرات استحمام فوارة غنية بالزيوت العطرية والترطيب العميق لتجربة استحمام مريحة.",
+      "body-care": "لوشن كريمي غني بالعناصر الطبيعية لتغذية بشرة الجسم وحمايتها من الجفاف بعبق عطري فاخر.",
+      "candles": "شمعة صويا طبيعية 100% معطرة بزيوت أساسية مهدئة ومصممة لخلق أجواء دافئة ومميزة وراحة مطلقة في المنزل.",
+      "face-care": "سيروم مغذي وكريم مرطب مصمم لتوحيد لون البشرة ومكافحة التجاعيد وإظهار توهج الوجه الطبيعي.",
+      "flash-sale": "عروض وتخفيضات حصرية مذهلة ولفترة محدودة للغاية على أرقى مستحضرات التجميل والعناية بالجسم والبشرة.",
+      "gentlemen": "زيوت ومستحضرات خاصة للعناية الكاملة باللحية وبشرة الوجه للرجال بتركيبة ممتازة وسريعة الامتصاص.",
+      "hair-care": "علاج مكثف لتغذية بصيلات الشعر وتنعيمه وحمايته من التلف والتساقط باستخدام مستخلصات زيوت طبيعية 100%.",
+      "lips-eyebrows-and-lashes": "تركيبة مغذية بزيوت الفيتامينات الأساسية لتكثيف وتقوية الرموش وترطيب الشفاه ومضاعفة جاذبيتها.",
+      "intimate-care": "غسول ناعم مهدئ ولطيف تم اختباره طبياً ومصمم خصيصاً للمناطق الحساسة لتأمين الحماية والانتعاش.",
+      "misk-el-tahara": "مسك الطهارة الأبيض الفاخر الأصلي لتعطير الجسم بنقاء مميز ورائحة عطرة وجاذبية تدوم طوال اليوم.",
+      "oils-serums-essences": "مستخلصات زيوت وسيروم نقية مئة بالمئة لتفتيح خلايا الجلد وحمايتها بلمعان طبيعي لا يضاهى.",
+      "younger": "منتجات فائقة اللطف ومصممة خصيصاً لتناسب البشرة الحساسة لليافعين والأطفال وتعمل على ترطيبها وحمايتها."
+    };
+    description_ar = descArMapping[slugKey] || "مستحضرات تجميلية فاخرة وطبيعية للعناية المتكاملة بجمالك وتألقك يومياً بأعلى جودة.";
+  }
 
   return {
     id,
@@ -444,10 +517,15 @@ function mapDBRowToProduct(row: any): Product {
 }
 
 function mapDBRowToCategory(row: any): Category {
-  const id = String(row.id || row.category_id || row.cat || row.name?.toLowerCase().replace(/\s+/g, '-') || "category-id");
+  // Use slug as primary key slug mapping for seamless join with subcategories
+  const id = String(row.slug || row.id || row.category_id || row.cat || row.name?.toLowerCase().replace(/\s+/g, '-') || "category-id").toLowerCase().trim();
   const name = String(row.name || row.title || row.category_name || row.label || "Gourmet Selection");
-  const description = String(row.description || row.desc || "");
-  const image_url = String(row.image_url || row.image || row.img || "https://images.unsplash.com/photo-1599490659213-e2b9527ec087?q=80&w=600&auto=format&fit=crop");
+  
+  // Find matching default category to merge premium Unsplash photographs and descriptions
+  const defaultMatch = DEFAULT_CATEGORIES.find(dc => dc.id === id || dc.id === row.slug || dc.name?.toLowerCase() === name.toLowerCase());
+
+  const description = String(row.description || row.desc || defaultMatch?.description || "");
+  const image_url = String(row.image_url || row.image || row.img || defaultMatch?.image_url || "https://images.unsplash.com/photo-1599490659213-e2b9527ec087?q=80&w=600&auto=format&fit=crop");
 
   return {
     id,
@@ -459,57 +537,41 @@ function mapDBRowToCategory(row: any): Category {
 
 export async function getProducts(): Promise<Product[]> {
   const allFoundProducts: Map<string, Product> = new Map();
+  const tableNames = ['online_store_products', 'all_products', 'products', 'yummy_products'];
 
-  // Try querying 'online_store_products'
-  try {
-    const { data, error } = await supabase.from('online_store_products').select('*');
-    if (!error && data && data.length > 0) {
-      data.forEach(row => {
-        const p = mapDBRowToProduct(row);
-        allFoundProducts.set(p.id, p);
-      });
+  const queryTable = async (tableName: string) => {
+    try {
+      const { data, error } = await supabase.from(tableName).select('*');
+      if (!error && data && data.length > 0) {
+        return data;
+      }
+    } catch (e) {
+      console.warn(`Querying table "${tableName}" failed:`, e);
     }
-  } catch (err) {
-    console.warn("Could not query 'online_store_products' on Supabase:", err);
-  }
+    return [];
+  };
 
-  // Try querying 'all_products'
   try {
-    const { data, error } = await supabase.from('all_products').select('*');
-    if (!error && data && data.length > 0) {
-      data.forEach(row => {
-        const p = mapDBRowToProduct(row);
-        allFoundProducts.set(p.id, p);
-      });
-    }
-  } catch (err) {
-    console.warn("Could not query 'all_products' on Supabase:", err);
-  }
+    // Race database queries with a 1.8-second hard timeout to avoid page loading freezes
+    const results = await Promise.race([
+      Promise.all(tableNames.map(name => queryTable(name))),
+      new Promise<any[]>((_, reject) => setTimeout(() => reject(new Error("Supabase select timeout")), 1800))
+    ]);
 
-  // Try querying 'products'
-  try {
-    const { data, error } = await supabase.from('products').select('*');
-    if (!error && data && data.length > 0) {
-      data.forEach(row => {
-        const p = mapDBRowToProduct(row);
-        allFoundProducts.set(p.id, p);
-      });
-    }
+    results.forEach(data => {
+      if (data && data.length > 0) {
+        data.forEach(row => {
+          const p = mapDBRowToProduct(row);
+          // Deduplicate by lowercased name or slug to avoid doubling rows with and without encoding defects
+          const duplicateKey = (p.slug || p.name).toLowerCase().trim();
+          if (!allFoundProducts.has(duplicateKey)) {
+            allFoundProducts.set(duplicateKey, p);
+          }
+        });
+      }
+    });
   } catch (err) {
-    console.warn("Could not query 'products' on Supabase:", err);
-  }
-
-  // Try querying 'yummy_products' as fallback
-  try {
-    const { data, error } = await supabase.from('yummy_products').select('*');
-    if (!error && data && data.length > 0) {
-      data.forEach(row => {
-        const p = mapDBRowToProduct(row);
-        allFoundProducts.set(p.id, p);
-      });
-    }
-  } catch (err) {
-    console.warn("Could not query 'yummy_products' on Supabase:", err);
+    console.warn("Supabase products query timed out or failed, falling back to local defaults:", err);
   }
 
   // If we collected any products from Supabase, return them
@@ -535,47 +597,44 @@ export async function getProducts(): Promise<Product[]> {
 
 export async function getCategories(): Promise<Category[]> {
   const allFoundCategories: Map<string, Category> = new Map();
+  const tableNames = ['categories', 'subcategories', 'yummy_categories'];
 
-  // Try querying 'categories'
-  try {
-    const { data, error } = await supabase.from('categories').select('*');
-    if (!error && data && data.length > 0) {
-      data.forEach(row => {
-        const c = mapDBRowToCategory(row);
-        allFoundCategories.set(c.id, c);
-      });
+  const queryTable = async (tableName: string) => {
+    try {
+      const { data, error } = await supabase.from(tableName).select('*');
+      if (!error && data && data.length > 0) {
+        return data;
+      }
+    } catch (e) {
+      console.warn(`Querying table "${tableName}" failed:`, e);
     }
-  } catch (err) {
-    console.warn("Could not query 'categories' on Supabase:", err);
-  }
+    return [];
+  };
 
-  // Try querying 'subcategories'
   try {
-    const { data, error } = await supabase.from('subcategories').select('*');
-    if (!error && data && data.length > 0) {
-      data.forEach(row => {
-        const c = mapDBRowToCategory(row);
-        // Only set if not already set, or name is more specific
-        if (!allFoundCategories.has(c.id)) {
-          allFoundCategories.set(c.id, c);
-        }
-      });
-    }
-  } catch (err) {
-    console.warn("Could not query 'subcategories' on Supabase:", err);
-  }
+    // Race database queries with a 1.8-second hard timeout
+    const results = await Promise.race([
+      Promise.all(tableNames.map(name => queryTable(name))),
+      new Promise<any[]>((_, reject) => setTimeout(() => reject(new Error("Supabase categories select timeout")), 1800))
+    ]);
 
-  // Try querying 'yummy_categories' as fallback
-  try {
-    const { data, error } = await supabase.from('yummy_categories').select('*');
-    if (!error && data && data.length > 0) {
-      data.forEach(row => {
-        const c = mapDBRowToCategory(row);
-        allFoundCategories.set(c.id, c);
-      });
-    }
+    results.forEach((data, index) => {
+      const tableName = tableNames[index];
+      if (data && data.length > 0) {
+        data.forEach(row => {
+          const c = mapDBRowToCategory(row);
+          if (tableName === 'subcategories') {
+            if (!allFoundCategories.has(c.id)) {
+              allFoundCategories.set(c.id, c);
+            }
+          } else {
+            allFoundCategories.set(c.id, c);
+          }
+        });
+      }
+    });
   } catch (err) {
-    console.warn("Could not query 'yummy_categories' on Supabase:", err);
+    console.warn("Supabase categories query timed out or failed, falling back to local defaults:", err);
   }
 
   if (allFoundCategories.size > 0) {

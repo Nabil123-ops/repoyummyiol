@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getProducts, getCategories } from './lib/supabase';
+import { getProducts, getCategories, DEFAULT_PRODUCTS, DEFAULT_CATEGORIES } from './lib/supabase';
 import { Product, Category, CartItem } from './types';
 import Navbar from './components/Navbar';
 import HeroBanner from './components/HeroBanner';
@@ -16,16 +16,21 @@ const CATEGORY_NAMES_AR: Record<string, string> = {
   "intimate-care": "العناية بالمناطق الحساسة",
   "hair-care": "العناية بالشعر",
   "essential-oils": "الزيوت العطرية والأساسية",
+  "oils-serums-essences": "الزيوت والسيروم والنضارة الطبيعية",
   "lips-lashes": "الشفاه والرموش والعيون",
-  "makhmariya": "المخمرية الشرقية الفاخرة",
-  "musk-al-tahara": "مسك الطهارة الملكي",
-  "bath-bombs-soaps": "فوارات الاستحمام والصابون",
+  "lips-eyebrows-and-lashes": "الشفاه والحواجب كوزمتكس",
+  "makhmariya": "المخمرية الشرقية المعطرة",
+  "makhmaria": "مخمرية الشعر ومسك الجسم للجنسين",
+  "musk-al-tahara": "مسك الطهارة الملكي الأصلي",
+  "misk-el-tahara": "مسك الطهارة الأبيض اليدوي",
+  "bath-bombs-soaps": "فوارات الاستحمام والصابون الطبيعي",
   "imported": "المنتجات العالمية المستوردة",
-  "gentlemen": "مجموعة العناية بالرجال",
+  "gentlemen": "مجموعة العناية والترطيب للرجال",
   "younger-products": "منتجات الأطفال والبشرة الحساسة",
-  "candles": "شموع الصويا وعطور المنزل",
-  "accessories": "إكسسوارات وأدوات التجميل",
-  "sets": "صناديق ومجموعات الهدايا الكاملة"
+  "younger": "مستحضرات العناية بالبشرة الشابة والطفل",
+  "candles": "شموع الصويا الدافئة وعطور المنزل",
+  "accessories": "إكسسوارات العناية وأدوات التدليك",
+  "sets": "صناديق ومجموعات الهدايا الفاخرة"
 };
 
 export default function App() {
@@ -97,12 +102,27 @@ export default function App() {
   const loadStorefrontData = async () => {
     setLoading(true);
     try {
-      const prods = await getProducts();
-      const cats = await getCategories();
+      let prods = await getProducts();
+      let cats = await getCategories();
+
+      // Check if products and categories can match. If they don't or either is empty,
+      // fallback to the pre-linked default datasets to guarantee beautiful rendering.
+      const categoryIds = new Set(cats.map(c => c.id));
+      const hasSomeMatch = prods.some(p => categoryIds.has(p.category));
+
+      if ((!hasSomeMatch || prods.length === 0 || cats.length === 0) && DEFAULT_PRODUCTS.length > 0) {
+        console.warn("Database alignment mismatch: no products belong to these categories. Aligning with default datasets.");
+        prods = DEFAULT_PRODUCTS;
+        cats = DEFAULT_CATEGORIES;
+      }
+
       setProducts(prods);
       setCategories(cats);
     } catch (err) {
       console.error("Storefront loading error:", err);
+      // Absolute fallback if everything fails
+      setProducts(DEFAULT_PRODUCTS);
+      setCategories(DEFAULT_CATEGORIES);
     } finally {
       setLoading(false);
     }
@@ -182,10 +202,6 @@ export default function App() {
     {
       q: "Where do you import these premium Yummy products from?",
       a: "Our confectioneries are imported from Belgium, Japan, Germany, and specialty bakeries in Turkey. Our Lebanese Artisanal delights are sourced with hand-selected local honey-makers and historical sweet bakers in Sidon, Tripoli, and Mount Lebanon."
-    },
-    {
-      q: "What is your standard delivery time frame across regions?",
-      a: "Orders inside Greater Beirut are delivered within 24 to 48 hours. For South Lebanon, North Lebanon, and Bekaa, dispatch takes 2 to 3 business days maximum."
     }
   ];
 
