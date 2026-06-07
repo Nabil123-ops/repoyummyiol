@@ -1,0 +1,6 @@
+{
+  "name": "Yummy Products LB",
+  "description": "Premium imported snacks, artisanal Lebanese sweets, and exotic beverages with real-time Supabase persistent synchronization and Cash on Delivery support.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
