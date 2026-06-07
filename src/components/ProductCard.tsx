@@ -78,24 +78,19 @@ export default function ProductCard({ product, onAddToCart, cartQuantity }: Prod
         {/* Rating Indicator */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
-            <Star className="w-4 h-4 text-pink-500 fill-pink-500" />
+            <Star className="w-4 h-4 text-salmon-500 fill-salmon-500" />
             <span className="text-xs font-semibold text-slate-700">{product.rating || 4.5}</span>
           </div>
-          <span className="text-[10px] bg-pink-50 text-pink-600 px-2 py-0.5 rounded font-mono font-medium uppercase tracking-wider">
+          <span className="text-[10px] bg-salmon-50 text-salmon-600 px-2 py-0.5 rounded font-mono font-medium uppercase tracking-wider">
             Verified Premium
           </span>
         </div>
 
         {/* Product Title */}
         <div className="flex flex-col">
-          <h3 className="font-sans font-bold text-slate-800 text-sm sm:text-base line-clamp-1 group-hover:text-pink-605 transition-colors">
+          <h3 className="font-sans font-bold text-slate-800 text-sm sm:text-base line-clamp-1 group-hover:text-salmon-600 transition-colors">
             {cleanText(product.name, false)}
           </h3>
-          {product.name_ar && (
-            <span className="font-sans font-bold text-right text-pink-700 text-xs sm:text-sm mt-0.5 block" dir="rtl">
-              {cleanText(product.name_ar, true)}
-            </span>
-          )}
         </div>
 
         {/* Product Description */}
@@ -104,7 +99,7 @@ export default function ProductCard({ product, onAddToCart, cartQuantity }: Prod
             {cleanText(product.description, false)}
           </p>
           {product.description_ar && (
-            <p className="text-[11px] text-slate-650 font-medium text-right leading-normal line-clamp-2 pt-1 border-t border-pink-50/50" dir="rtl">
+            <p className="text-[11px] text-slate-650 font-medium text-right leading-normal line-clamp-2 pt-1 border-t border-salmon-100" dir="rtl">
               {cleanText(product.description_ar, true)}
             </p>
           )}
@@ -118,7 +113,7 @@ export default function ProductCard({ product, onAddToCart, cartQuantity }: Prod
                 <span className="text-xs text-slate-400 line-through font-mono">
                   ${product.price.toFixed(2)}
                 </span>
-                <span className="text-lg sm:text-xl font-bold font-mono text-pink-600">
+                <span className="text-lg sm:text-xl font-bold font-mono text-salmon-500">
                   ${product.discount_price!.toFixed(2)}
                 </span>
               </>
@@ -129,27 +124,27 @@ export default function ProductCard({ product, onAddToCart, cartQuantity }: Prod
             )}
           </div>
 
-          {/* Dynamic Interactive Add button */}
+          {/* Dynamic Interactive Add button: White with Salmon details */}
           <button
             id={`add-to-cart-${product.id}`}
             onClick={(e) => {
               e.stopPropagation();
               onAddToCart(product);
             }}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold select-none transition-all cursor-pointer shadow-xs ${
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold select-none transition-all cursor-pointer shadow-xs border ${
               cartQuantity > 0
-                ? 'bg-pink-600 text-white px-3.5'
-                : 'bg-pink-100/80 hover:bg-pink-200 text-pink-750 border border-pink-200/90'
+                ? 'bg-white hover:bg-salmon-50 text-salmon-600 border-salmon-500 px-3.5'
+                : 'bg-white hover:bg-salmon-50 text-salmon-500 border-salmon-200 hover:border-salmon-400'
             }`}
           >
             {cartQuantity > 0 ? (
               <>
-                <Check className="w-4 h-4" />
+                <Check className="w-4 h-4 text-salmon-500" />
                 <span>Added ({cartQuantity})</span>
               </>
             ) : (
               <>
-                <ShoppingCart className="w-4 h-4" />
+                <ShoppingCart className="w-4 h-4 text-salmon-500" />
                 <span>Add to Cart</span>
               </>
             )}

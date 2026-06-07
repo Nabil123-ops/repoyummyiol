@@ -422,17 +422,6 @@ export default function AdminPanel({
                       />
                     </div>
 
-                    <div className="space-y-1" dir="rtl">
-                      <label className="text-[11px] text-slate-400 font-sans font-bold block text-right text-amber-300">اسم المنتج باللغة العربية (اختياري)</label>
-                      <input
-                        type="text"
-                        placeholder="مثال: رول اللافندر المهدئ"
-                        value={productForm.name_ar || ''}
-                        onChange={(e) => setProductForm({ ...productForm, name_ar: e.target.value })}
-                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs focus:ring-1 focus:ring-amber-500 text-right font-sans"
-                      />
-                    </div>
-
                     <div className="space-y-1">
                       <label className="text-[11px] text-slate-400 font-semibold font-mono">Category</label>
                       <select

@@ -8,6 +8,7 @@ import ProductCard from './components/ProductCard';
 import CartDrawer from './components/CartDrawer';
 import CheckoutModal from './components/CheckoutModal';
 import AdminPanel from './components/AdminPanel';
+import CategoriesPromoBanners from './components/CategoriesPromoBanners';
 import { Sparkles, ArrowLeft, Search, Phone, ShieldCheck, Heart, Trash2, MapPin, Truck, RefreshCw, AlertCircle, ShoppingBag, HelpCircle, ChevronDown, Check, Star, Menu, MessageSquare, X, ArrowRight } from 'lucide-react';
 
 const CATEGORY_NAMES_AR: Record<string, string> = {
@@ -693,9 +694,15 @@ export default function App() {
                   })}
                 </div>
               )}
+              
+              {/* Dynamic curated multi promo banners under the categories row */}
+              <CategoriesPromoBanners onSelectCategory={(catId) => {
+                setSelectedCategory(catId);
+                setFlashSaleFilter(false);
+              }} />
             </div>
 
-            <div id="catalog-start-anchor" className="scroll-mt-24 pb-2 border-b border-pink-100"></div>
+            <div id="catalog-start-anchor" className="scroll-mt-24 pb-2 border-b border-salmon-100"></div>
 
             {/* Catalog Header with current search and select state */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

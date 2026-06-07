@@ -30,7 +30,7 @@ export default function Navbar({
   setFlashSaleFilter
 }: NavbarProps) {
   return (
-    <nav className="sticky top-0 z-50 bg-white border-b border-pink-100 text-slate-850 shadow-md backdrop-blur-md bg-opacity-95">
+    <nav className="sticky top-0 z-50 bg-white border-b border-salmon-100 text-slate-850 shadow-md backdrop-blur-md bg-opacity-95">
       <div id="nav-container" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           
@@ -40,7 +40,7 @@ export default function Navbar({
             <button
               id="hamburger-trigger"
               onClick={onOpenHamburger}
-              className="p-2.5 rounded-xl text-pink-600 hover:bg-pink-50 transition-colors focus:outline-none cursor-pointer"
+              className="p-2.5 rounded-xl text-salmon-600 hover:bg-salmon-50 transition-colors focus:outline-none cursor-pointer"
               title="Shop Categories Menu"
             >
               <Menu className="w-6 h-6 stroke-[2.5]" />
@@ -54,22 +54,21 @@ export default function Navbar({
               window.history.pushState(null, '', '/');
               window.dispatchEvent(new Event('popstate'));
             }}>
-              <div className="relative w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-sm overflow-hidden border border-pink-100/60 p-0.5">
+              <div className="relative w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-sm overflow-hidden border border-salmon-100 p-0.5">
                 <img 
                   src="https://i.ibb.co/8J3WdDd/Yummy-Products-LB-1.webp" 
                   alt="Yummy Products LB Signature" 
                   className="w-full h-full object-contain"
                   onError={(e) => {
-                    // Failover to local placeholder if offline, but keep image display high priority
                     e.currentTarget.src = "/Yummy Products LB.webp";
                   }}
                 />
               </div>
               <div className="hidden sm:block text-left">
-                <span className="font-sans font-bold tracking-tight text-lg bg-gradient-to-r from-pink-650 via-pink-500 to-rose-600 bg-clip-text text-transparent">
+                <span className="font-sans font-extrabold tracking-tight text-lg bg-gradient-to-r from-salmon-600 via-salmon-500 to-rose-505 bg-clip-text text-transparent">
                   Yummy Products LB
                 </span>
-                <span className="block text-[9px] font-mono tracking-widest text-pink-500 uppercase font-extrabold leading-none mt-0.5">
+                <span className="block text-[9px] font-mono tracking-widest text-salmon-500 uppercase font-extrabold leading-none mt-0.5">
                   Lebanon Imports Premium
                 </span>
               </div>
@@ -91,10 +90,10 @@ export default function Navbar({
                     window.dispatchEvent(new Event('popstate'));
                   }
                 }}
-                className="w-full bg-pink-50/50 border border-pink-100 rounded-full py-2.5 pl-10 pr-4 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-pink-500 transition-all font-light"
+                className="w-full bg-salmon-50/50 border border-salmon-100 rounded-full py-2.5 pl-10 pr-4 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-salmon-300 focus:border-salmon-500 transition-all font-light"
               />
               <Search 
-                className="absolute left-3.5 top-3 w-4 h-4 text-pink-400 cursor-pointer hover:text-pink-600 transition-colors" 
+                className="absolute left-3.5 top-3 w-4 h-4 text-salmon-400 cursor-pointer hover:text-salmon-600 transition-colors" 
                 onClick={() => {
                   window.history.pushState(null, '', `/search?q=${encodeURIComponent(searchQuery)}`);
                   window.dispatchEvent(new Event('popstate'));
@@ -115,22 +114,22 @@ export default function Navbar({
               }}
               className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all uppercase cursor-pointer ${
                 flashSaleFilter 
-                  ? 'bg-pink-605 text-white shadow-lg' 
-                  : 'bg-pink-50 hover:bg-pink-150 text-pink-600 border border-pink-100'
+                  ? 'bg-salmon-600 text-white shadow-lg' 
+                  : 'bg-white hover:bg-salmon-50 text-salmon-600 border border-salmon-200'
               }`}
             >
-              <Sparkles className="w-3.5 h-3.5 fill-current animate-pulse" />
+              <Sparkles className="w-3.5 h-3.5 fill-current animate-pulse text-salmon-500" />
               Flash Sale
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-pink-500 ring-2 ring-white animate-pulse"></span>
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-salmon-500 ring-2 ring-white animate-pulse"></span>
             </button>
 
-            {/* Admin trigger button with verified shield */}
+            {/* Admin trigger button with verified shield: White with Salmon text & borders */}
             <button
               id="admin-btn"
               onClick={onOpenAdmin}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide bg-pink-550 hover:bg-pink-600 text-white transition-all uppercase cursor-pointer shadow-sm"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold tracking-wide bg-white hover:bg-salmon-50 text-salmon-600 hover:text-salmon-800 border border-salmon-200 transition-all uppercase cursor-pointer shadow-sm"
             >
-              <ShieldCheck className="w-3.5 h-3.5" />
+              <ShieldCheck className="w-3.5 h-3.5 text-salmon-500" />
               Admin
             </button>
 
@@ -138,11 +137,11 @@ export default function Navbar({
             <button
               id="cart-trigger"
               onClick={onOpenCart}
-              className="relative p-2.5 rounded-xl bg-pink-50 hover:bg-pink-100 border border-pink-100 text-pink-600 transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-sm"
+              className="relative p-2.5 rounded-xl bg-white hover:bg-salmon-50 border border-salmon-200 text-salmon-600 transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-xs"
             >
-              <ShoppingBag className="w-5.5 h-5.5" />
+              <ShoppingBag className="w-5.5 h-5.5 text-salmon-500" />
               {cartCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-gradient-to-tr from-pink-500 to-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-bounce shadow-sm">
+                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-gradient-to-tr from-salmon-500 to-salmon-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-bounce shadow-sm">
                   {cartCount}
                 </span>
               )}
@@ -152,7 +151,7 @@ export default function Navbar({
         </div>
 
         {/* Mobile secondary bar: search box */}
-        <div className="flex md:hidden pb-3.5 px-1 pt-1 border-t border-pink-50/40">
+        <div className="flex md:hidden pb-3.5 px-1 pt-1 border-t border-salmon-50/40">
           <div className="relative w-full">
             <input
               id="search-mobile-input"
@@ -166,10 +165,10 @@ export default function Navbar({
                   window.dispatchEvent(new Event('popstate'));
                 }
               }}
-              className="w-full bg-pink-50/50 border border-pink-100 rounded-full py-2.5 pl-9 pr-4 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-pink-400"
+              className="w-full bg-salmon-50/50 border border-salmon-100 rounded-full py-2.5 pl-9 pr-4 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-salmon-300"
             />
             <Search 
-              className="absolute left-3 top-3.5 w-4 h-4 text-pink-400 cursor-pointer" 
+              className="absolute left-3 top-3.5 w-4 h-4 text-salmon-400 cursor-pointer" 
               onClick={() => {
                 window.history.pushState(null, '', `/search?q=${encodeURIComponent(searchQuery)}`);
                 window.dispatchEvent(new Event('popstate'));
@@ -179,17 +178,17 @@ export default function Navbar({
         </div>
 
         {/* Category filters bar */}
-        <div id="category-scroller" className="flex items-center gap-2 overflow-x-auto pb-3 pt-2.5 scrollbar-none border-t border-pink-50">
+        <div id="category-scroller" className="flex items-center gap-2 overflow-x-auto pb-3 pt-2.5 scrollbar-none border-t border-salmon-50">
           <button
             id="cat-all"
             onClick={() => {
               setSelectedCategory(null);
               setFlashSaleFilter(false);
             }}
-            className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer shadow-sm ${
+            className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer shadow-xs ${
               selectedCategory === null && !flashSaleFilter
-                ? 'bg-pink-600 text-white font-semibold'
-                : 'bg-pink-50/60 hover:bg-pink-100 text-pink-700 hover:text-pink-850 border border-pink-100/80'
+                ? 'bg-salmon-500 text-white font-bold'
+                : 'bg-white hover:bg-salmon-50 text-salmon-600 border border-salmon-200'
             }`}
           >
             All Products
@@ -201,10 +200,10 @@ export default function Navbar({
                 setSelectedCategory(cat.id);
                 setFlashSaleFilter(false);
               }}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer shadow-sm ${
+              className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer shadow-xs ${
                 selectedCategory === cat.id
-                  ? 'bg-pink-500 text-white font-semibold'
-                  : 'bg-pink-50/60 hover:bg-pink-100 text-pink-700 hover:text-pink-850 border border-pink-100/80'
+                  ? 'bg-salmon-500 text-white font-bold'
+                  : 'bg-white hover:bg-salmon-50 text-salmon-600 border border-salmon-200'
               }`}
             >
               {cat.name}

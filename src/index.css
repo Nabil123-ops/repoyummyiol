@@ -2,6 +2,13 @@
 
 @theme {
   --animate-spin-slow: spin 20s linear infinite;
+  --color-salmon-50: #FFF5F2;
+  --color-salmon-100: #FFEAE4;
+  --color-salmon-200: #FFD5C9;
+  --color-salmon-500: #FA8072;
+  --color-salmon-600: #E96D5F;
+  --color-salmon-700: #D85D4F;
+  --color-salmon-800: #B74639;
 }
 
 @keyframes fadeIn {
