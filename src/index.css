@@ -2,13 +2,16 @@
 
 @theme {
   --animate-spin-slow: spin 20s linear infinite;
-  --color-salmon-50: #FFF5F2;
-  --color-salmon-100: #FFEAE4;
-  --color-salmon-200: #FFD5C9;
-  --color-salmon-500: #FA8072;
-  --color-salmon-600: #E96D5F;
-  --color-salmon-700: #D85D4F;
-  --color-salmon-800: #B74639;
+
+  --color-lavender-50: #FAF5FF;
+  --color-lavender-100: #F3E8FF;
+  --color-lavender-200: #E9D5FF;
+  --color-lavender-300: #D8B4FE;
+  --color-lavender-400: #C084FC;
+  --color-lavender-500: #A855F7;
+  --color-lavender-600: #9333EA;
+  --color-lavender-700: #7E22CE;
+  --color-lavender-800: #6B21A8;
 }
 
 @keyframes fadeIn {
